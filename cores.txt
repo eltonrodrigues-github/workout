@@ -1,0 +1,6 @@
+Amarelo 1: #F1A624
+Amarelo 2: #FBB911
+Preto    : #000
+Preto 2  : #212528
+Cinza    : #929291
+Vermelho : #DE1928
