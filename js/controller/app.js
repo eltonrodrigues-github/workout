@@ -8,21 +8,42 @@ var Treino = function(id, nome, feito){
 	this.feito = feito || false;
 };
 
+var Exercicio = function(id, nome, serie, repeticao, carga, aparelho, configuracao, feito){
+	this.id           = id || Util.guid();
+	this.nome         = nome || "";
+	this.serie        = serie || 0
+	this.repeticao    = repeticao || 0;
+	this.carga        = carga || 0;
+	this.aparelho     = aparelho || 0;
+	this.configuracao = configuracao || "";
+	this.feito        = feito || false;
+};
+
+var TreinoExercicio = function(id, list){
+	this.id         = id;
+	this.exercicios = list || [];
+};
 
 var App = function(){
-	this.treinoKey   = 'treinos';
+	this.treinoKey         = 'treinos';
 	this.seletorListTreino = "ul.list.treinos";
-	this.treinos     = [];
-	this.tplTreino   = '<li id="#ID#">'
-						+	'<div>'
-						+		'<div class="check"></div>'
-						+		'<div class="corpo">#NOME#</div>'
-						+		'<div class="acao">'
-						+			'<a class="edit" title="Editar" href="#"><span class="fa fa-edit"></span></a>'
-						+			'<a class="remove" title="Excluir" href="#"><span class="fa fa-trash"></span></a>'
-						+		'</div>'
-						+	'</div>'
-						+'</li>';
+	this.treinos           = [];
+
+	this.treinoSelecionado = null;
+	this.seletorListExerc  = 'ul.list.exercicios';
+	this.treinoExercicio   = new TreinoExercicio();
+	this.exercicios        = [];
+
+	this.tplItemList       = '<li id="#ID#">'
+							+	'<div>'
+							+		'<div class="check"></div>'
+							+		'<div class="corpo">#NOME#</div>'
+							+		'<div class="acao">'
+							+			'<a class="edit" title="Editar" href="#"><span class="fa fa-edit"></span></a>'
+							+			'<a class="remove" title="Excluir" href="#"><span class="fa fa-trash"></span></a>'
+							+		'</div>'
+							+	'</div>'
+							+'</li>';
 };
 
 App.inicializar = function (){
@@ -38,9 +59,9 @@ App.inicializar = function (){
 App.prototype.bindEvents = function(){
 	var scope = this;
 
-	$(document).on('click', '#novo_treino', function(e){ e.preventDefault(); scope.novoTreino(); });
+	////Treino
 
-	$(document).on('click', '.ajax', function(e){ e.preventDefault(); scope.carregarPorAjax(this); });
+	$(document).on('click', '#novo_treino', function(e){ e.preventDefault(); scope.novoTreino(); });
 
 	$(document).on('click', 'ul.treinos a.edit', function(e){ e.preventDefault(); scope.editarTreino(this); });
 
@@ -49,14 +70,19 @@ App.prototype.bindEvents = function(){
 	$(document).on('click', 'ul.treinos div.check', function(){ scope.marcarTreino(this); });
 
 	$(document).on('sortstop', 'ul.list.treinos', function(){ scope.ordenarTreinos(); });
-};
 
-App.prototype.carregarPorAjax = function(element){
-	var url = $(element).attr('href');
+	$(document).on('click', '.back.treino', function(){ scope.recuperarTreinos(); scope.carregarPaginaInicial(); });
 
-	$.get(url, function(data){
-		$('.container').html(data);
-	});
+	$(document).on('click', 'ul.list.treinos div.corpo', function(){ scope.listarExercicios(this); });
+
+	////Exercicio
+	$(document).on('click', '#novo_exercicio', function(e){e.preventDefault(); scope.novoExercicio(); });
+
+	$(document).on('submit', '#form_exercicio', function(){ scope.novoExercicioSalvar(); return false; });
+
+	$(document).on('click', '.back.exercicio', function(){ scope.listarExercicios(false, scope.treinoSelecionado.id); });
+
+	$(document).on('click', 'ul.exercicios div.check', function(){ scope.marcarExercicio(this); });
 };
 
 App.prototype.carregarPaginaInicial = function(){
@@ -73,6 +99,13 @@ App.prototype.recuperarTreinos = function(){
 	this.treinos = dados ? JSON.parse(dados) : [];
 };
 
+App.prototype.buscarTreino = function(treinoId){
+	for (var i = 0; i < this.treinos.length; i++) {
+		if(this.treinos[i].id === treinoId)
+			return this.treinos[i];
+	};
+};
+
 App.prototype.salvarTreinos = function(){
 
 	localStorage.setItem(this.treinoKey, JSON.stringify(this.treinos));
@@ -84,7 +117,7 @@ App.prototype.montarTreinos = function(){
 		var t = this.treinos[i];
 		var classCheck = t.feito ? 'checked' : 'unchecked';
 
-		var li = $(this.tplTreino.replace('#ID#', t.id).replace('#NOME#', t.nome)).hide();
+		var li = $(this.tplItemList.replace('#ID#', t.id).replace('#NOME#', t.nome)).hide();
 
 		li.find('.check').addClass(classCheck);
 
@@ -99,7 +132,7 @@ App.prototype.novoTreino = function(){
 		var id = Util.guid();
 		var ul = $(this.seletorListTreino);
 
-		var li = $(this.tplTreino.replace('#ID#', id).replace('#NOME#', treino)).hide();
+		var li = $(this.tplItemList.replace('#ID#', id).replace('#NOME#', treino)).hide();
 		li.find('.check').addClass('unchecked');
 		li.appendTo(ul).slideDown(300);
 
@@ -193,6 +226,102 @@ App.prototype.ordenarTreinos = function(){
 	this.salvarTreinos();
 };
 
+//------- Exercicios
+
+App.prototype.listarExercicios = function(element, treinoId){
+	if(element){
+		treinoId = $(element).closest('li').attr('id');
+		this.treinoSelecionado = this.buscarTreino(treinoId);
+		this.recuperarExercicios(treinoId);
+	}
+
+	var scope = this;
+	Util.carregarPorAjax('exercicios.html', '.container', function(){
+		$('div.titulo').text(scope.treinoSelecionado.nome);
+
+		scope.montarExercicios();
+
+		$('ul.list').sortable();
+	});
+};
+
+App.prototype.recuperarExercicios = function(treinoId){
+	var dados = localStorage.getItem(treinoId);
+	if(dados) {
+		this.treinoExercicio = JSON.parse(dados);
+		this.exercicios      = [];
+		for (var i = 0; i < this.treinoExercicio.exercicios.length; i++) {
+			var id = this.treinoExercicio.exercicios[i];
+			var ex =  JSON.parse(localStorage.getItem(id));
+			this.exercicios.push(ex);
+		};
+	}
+	else{
+		this.treinoExercicio = new TreinoExercicio(treinoId);
+		localStorage.setItem(treinoId, JSON.stringify(this.treinoExercicio));
+	}
+};
+
+App.prototype.montarExercicios = function(){
+	var ul = $(this.seletorListExerc);
+	for (var i = 0; i < this.exercicios.length; i++) {
+		var e = this.exercicios[i];
+		var classCheck = e.feito ? 'checked' : 'unchecked';
+
+		var nome = e.aparelho + ' - ' + e.nome + ' - ' + e.carga + 'kg';
+
+		var li = $(this.tplItemList.replace('#ID#', e.id).replace('#NOME#', nome)).hide();
+
+		li.find('.check').addClass(classCheck);
+
+		li.appendTo(ul).slideDown(300);
+	};
+};
+
+App.prototype.novoExercicio = function(){
+	var scope = this;
+	Util.carregarPorAjax('exercicio.html', '.container', function(){
+		$('div.titulo').text('Novo Exercício');
+	});
+};
+
+App.prototype.novoExercicioSalvar = function(){
+	var ex   = $('#form_exercicio').serializeObject();
+	ex.feito = false;
+	ex.id    = Util.guid();
+
+	localStorage.setItem(ex.id, JSON.stringify(ex));
+
+	this.treinoExercicio.exercicios.push(ex.id);
+	localStorage.setItem(this.treinoExercicio.id, JSON.stringify(this.treinoExercicio));
+
+	this.exercicios.push(ex);
+
+	this.listarExercicios(false, this.treinoSelecionado.id);
+};
+
+App.prototype.marcarExercicio = function(element){
+	element = $(element);
+
+	element.toggleClass('checked unchecked');
+
+	var id = element.closest('li').attr('id');
+
+	var exercicio = {};
+
+	for (var i = 0; i < this.exercicios.length; i++) {
+		var e = this.exercicios[i];
+		if(e.id === id){
+			e.feito = !e.feito;
+			this.exercicios[i] = e;
+			exercicio = e;
+			break;
+		}
+	};
+
+	localStorage.setItem(id, JSON.stringify(exercicio));
+};
+
 
 var Util = function(){};
 
@@ -205,9 +334,25 @@ Util.guid = function(){
 };
 
 Util.carregarPorAjax = function(url, element, callback){
-	$.get(url, function(data){
+	$.ajax({
+		type: 'GET',
+		url: url,
+		cache: false
+	})
+	.done(function(data){
 		$(element).html(data);
 		if(callback)
 			callback();
 	});
+};
+
+jQuery.fn.serializeObject = function () {
+    var unindexed_array = this.serializeArray();
+    var indexed_array = {};
+
+    $.map(unindexed_array, function (n, i) {
+        indexed_array[n['name']] = n['value'];
+    });
+
+    return indexed_array;
 };

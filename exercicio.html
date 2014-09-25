@@ -1,21 +1,30 @@
-<h3>Novo Exercício</h3>
+<div class="top">
+	<div class="back exercicio"><span class="fa fa-arrow-left"></span></div>
+	<div class="titulo"></div>
+</div>
+<form id="form_exercicio">
+	<input type="hidden" name="id" id="id"/>
 
-<label for="Aparelho">Aparelho</label>
-<input type="number" class="form-control" name="Aparelho" id="Aparelho"/>
+	<label for="nome">Exercício</label>
+	<input type="text" class="form-control" name="nome" id="nome" required/>
 
-<label for="Exercicio">Exercício</label>
-<input type="text" class="form-control" name="Exercicio" id="Exercicio"/>
+	<label for="aparelho">Aparelho</label>
+	<input type="number" class="form-control" name="aparelho" id="aparelho" required/>
 
-<label for="Configuracoes">Configurações</label>
-<input type="text" class="form-control" name="Configuracoes" id="Configuracoes"/>
+	<label for="configuracao">Configurações</label>
+	<input type="text" class="form-control" name="configuracao" id="configuracao" />
 
-<label for="Carga">Carga</label>
-<input type="number" class="form-control" name="Carga" id="Carga"/>
+	<label for="carga">Carga</label>
+	<input type="number" class="form-control" name="carga" id="carga" required/>
 
-<label for="Repeticoes">Repetições</label>
-<input type="number" class="form-control" name="Repeticoes" id="Repeticoes"/>
+	<label for="serie">Série</label>
+	<input type="number" class="form-control" name="serie" id="serie" required/>
 
-<a type="submit" id="save_exercicio" class="btn-footer">
-	<span class="fa fa-bolt"></span>
-	Salvar
-</a>
+	<label for="repeticoes">Repetições</label>
+	<input type="number" class="form-control" name="repeticoes" id="repeticoes" required/>
+
+	<button type="submit" class="btn-footer">
+		<span class="fa fa-save"></span>
+		Salvar
+	</button>
+</form>

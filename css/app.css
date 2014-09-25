@@ -1,7 +1,11 @@
+
 body {
+	font-family: 'Open Sans';
+	font-size: 16px;
+	color: #fff;
+
 	background: #000 url(../img/body-background.gif);
 	width: 100%;
-	color: #fff;
 	margin: 40px 0 45px 0;
 	border-top: 3px solid #929291;
 	border-bottom: 3px solid #929291;
@@ -20,6 +24,7 @@ body {
 	text-align: center;
 	margin: 10px;
 	font-size: 18px;
+	font-weight: bold;
 }
 
 .container{
@@ -83,7 +88,7 @@ ul.list > li > div > div.corpo {
 	background-color: #F1A624;
 	border-radius: 3px;
 	width: 100%;
-	padding: 5px;
+	padding: 4px;
 }
 
 ul.list > li > div > div.acao {
@@ -93,7 +98,7 @@ ul.list > li > div > div.acao {
 
 ul.list > li > div > div.acao > a {
 	width: 30px;
-	border: 2px solid #CC303C;
+	border: 2px solid #E2312F;
 	background-color: #DE1928;
 	border-radius: 3px;
 	margin-left: 5px;
@@ -118,4 +123,59 @@ ul.list > li > div > div.acao > a > span{
 	text-align: center;
 	text-decoration: none;
 	font-size: 20px;
+}
+
+/* lista de exercicios */
+.top {
+    height: 40px;
+}
+
+.back {
+	cursor: pointer;
+    color: #DE1928;
+    font-size: 38px;
+    margin: 0 5px;
+    width: 10%;
+    float: left;
+	position: absolute;
+	top: 0;
+}
+
+.back:hover {
+    color: #FCE224;
+}
+
+div.titulo {
+    float: left;
+    background-color: #FCE224;
+	color: #000;
+    position: relative;
+	width:100%;
+    height: 82%;
+    text-align: center;
+    border-radius: 5px;
+    padding-top: 7px;
+    font-weight: bold;
+    font-size: 20px;
+}
+
+/*Exercicio FORM*/
+
+form#form_exercicio {
+	width: 90%;
+	position: relative;
+	margin: 0 auto;
+	margin-top: 20px;
+}
+
+form#form_exercicio h3 {
+	text-align: center;
+}
+
+form#form_exercicio input {
+	width: 100%;
+	height: 30px;
+	margin: 5px 0 10px 0;
+	font-size: 18px;
+	padding-left: 10px;
 }
