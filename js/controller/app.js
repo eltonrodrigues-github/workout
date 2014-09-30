@@ -94,6 +94,21 @@ App.prototype.bindEvents = function(){
 	$(document).on('click', 'ul.list.exercicios .corpo', function(){ scope.exibirExercicio(this); });
 
 	$(document).on('click', '.preview .close, .preview-backface', function(){ $('.preview, .preview-backface').fadeOut(300); });
+
+	$(document).on('click', '.sortable', function(e){ e.preventDefault(); scope.toggleSort(this); });
+};
+
+App.prototype.toggleSort = function(element){
+	element = $(element);
+
+	var desativar = element.hasClass('sort-active');
+
+	if(desativar)
+		Util.disableSort();
+	else
+		Util.enableSort();
+
+	element.toggleClass('sort-active');
 };
 
 App.prototype.carregarPaginaInicial = function(){
@@ -101,7 +116,6 @@ App.prototype.carregarPaginaInicial = function(){
 
 	Util.carregarPorAjax('treinos.html', '.container', function(){
 		scope.montarTreinos();
-		Util.sortableList();
 	});
 };
 
@@ -259,10 +273,7 @@ App.prototype.listarExercicios = function(element, treinoId){
 	var scope = this;
 	Util.carregarPorAjax('exercicios.html', '.container', function(){
 		$('div.titulo').text(scope.treinoSelecionado.nome);
-
 		scope.montarExercicios();
-
-		Util.sortableList();
 	});
 };
 
@@ -487,7 +498,18 @@ Util.delete = function(key){
 	localStorage.removeItem(key);
 };
 
-Util.sortableList = function(){
+Util.enableSort = function(){
+	var list = $('ul.list');
 
-	$('ul.list').sortable({ delay:300 });
+	var isSortable = list.sortable( "instance" );
+
+	if(isSortable)
+		list.sortable("enable");
+	else
+		list.sortable();
+};
+
+Util.disableSort = function(){
+
+	$('ul.list').sortable("disable");
 };
