@@ -133,7 +133,6 @@ ul.list > li > div > div.acao > a > span{
 	text-decoration: none;
 	color: #fff;
 	font-size: 20px;
-	box-shadow: 0 -4px 0 #878E96;
 	padding: 8px;
 }
 
@@ -156,10 +155,6 @@ button.btn-footer {
     float: left;
 	position: absolute;
 	top: 0;
-}
-
-.back:hover {
-    color: #FCE224;
 }
 
 div.titulo {
