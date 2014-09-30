@@ -96,6 +96,11 @@ ul.list > li > div > div.corpo {
 	padding-left: 5px;
 	margin-left: 37px;
 	margin-right: 74px;
+	white-space: nowrap;
+	-ms-text-overflow: ellipsis;
+	-o-text-overflow: ellipsis;
+	text-overflow: ellipsis;
+	overflow: hidden;
 }
 
 ul.list > li > div > div.acao {
@@ -174,11 +179,8 @@ div.titulo {
 /*FORM*/
 
 div.form {
-	width: 90%;
-	margin: 0 auto;
 	margin-top: 20px;
-	padding: 0 10px;
-	height: 85%;
+	padding: 4px;
 }
 
 div.field {
@@ -219,7 +221,7 @@ span.message-validade {
 	z-index: 999;
     position: absolute;
     left: 9%;
-    top: 16%;
+	top: 25%;
     width: 75%;
     padding: 10px 15px;
     background-color: #FCE224;

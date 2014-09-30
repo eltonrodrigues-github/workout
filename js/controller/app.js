@@ -249,7 +249,6 @@ App.prototype.ordenarTreinos = function(){
 };
 
 //------- Exercicios
-
 App.prototype.listarExercicios = function(element, treinoId){
 	if(element){
 		treinoId = $(element).closest('li').attr('id');
@@ -283,7 +282,9 @@ App.prototype.montarExercicios = function(){
 		var e = this.exercicios[i];
 		var classCheck = e.feito ? 'checked' : 'unchecked';
 
-		var nome = e.aparelho + ' - ' + e.nome + ' - ' + e.carga + 'kg';
+		var aparelho = e.aparelho ? e.aparelho + '-' : '';
+
+		var nome = aparelho + e.nome + ' - ' + e.serie + ' x ' + e.repeticao + ' - ' + e.carga + 'kg';
 
 		var li = $(this.tplItemList.replace('#ID#', e.id).replace('#NOME#', nome)).hide();
 
@@ -468,6 +469,7 @@ Util.carregarPorAjax = function(url, element, callback){
 };
 
 Util.save = function(key, obj){
+
 	localStorage.setItem(key, JSON.stringify(obj));
 }
 
@@ -481,5 +483,6 @@ Util.load = function(key){
 }
 
 Util.delete = function(key){
+
 	localStorage.removeItem(key);
 }
