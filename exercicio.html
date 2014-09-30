@@ -2,29 +2,41 @@
 	<div class="back exercicio"><span class="fa fa-arrow-left"></span></div>
 	<div class="titulo"></div>
 </div>
-<form id="form_exercicio">
+<div class="form">
 	<input type="hidden" name="id" id="id"/>
 
-	<label for="nome">Exercício</label>
-	<input type="text" class="form-control" name="nome" id="nome" required/>
+	<div class="field">
+		<label for="nome">Exercício</label>
+		<input type="text" class="required" name="nome" id="nome" />
+	</div>
 
-	<label for="aparelho">Aparelho</label>
-	<input type="number" class="form-control" name="aparelho" id="aparelho" required/>
+	<div class="field">
+		<label for="aparelho">Aparelho</label>
+		<input type="number" name="aparelho" id="aparelho"/>
+	</div>
 
-	<label for="configuracao">Configurações</label>
-	<input type="text" class="form-control" name="configuracao" id="configuracao" />
+	<div class="field">
+		<label for="configuracao">Configurações</label>
+		<input type="text" name="configuracao" id="configuracao" />
+	</div>
 
-	<label for="carga">Carga</label>
-	<input type="number" class="form-control" name="carga" id="carga" required/>
+	<div class="field">
+		<label for="carga">Carga</label>
+		<input type="number" class="required" name="carga" id="carga"/>
+	</div>
 
-	<label for="serie">Série</label>
-	<input type="number" class="form-control" name="serie" id="serie" required/>
+	<div class="field">
+		<label for="serie">Série</label>
+		<input type="number" class="required" name="serie" id="serie"/>
+	</div>
 
-	<label for="repeticoes">Repetições</label>
-	<input type="number" class="form-control" name="repeticoes" id="repeticoes" required/>
+	<div class="field">
+		<label for="repeticao">Repetições</label>
+		<input type="number" class="required" name="repeticao" id="repeticao" data-val="required number"/>
+	</div>
 
-	<button type="submit" class="btn-footer">
+	<button type="button" id="save_exercicio" class="btn-footer">
 		<span class="fa fa-save"></span>
 		Salvar
 	</button>
-</form>
+</div>

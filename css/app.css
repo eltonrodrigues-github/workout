@@ -6,7 +6,7 @@ body {
 
 	background: #000 url(../img/body-background.gif);
 	width: 100%;
-	margin: 40px 0 45px 0;
+	margin: 40px 0 49px 0;
 	border-top: 3px solid #929291;
 	border-bottom: 3px solid #929291;
 	-webkit-user-select: none;
@@ -41,7 +41,6 @@ ul > li {
 }
 
 ul > li > div {
-	display: flex;
 	height: 32px;
 }
 
@@ -53,10 +52,10 @@ ul.list > li {
 	content: "X";
 	font-family: sans-serif;
 	color: #DE1928;
+	font-size: 40px;
+	top: -1px;
 	position: relative;
-	top: -11px;
-	left: -3px;
-	font-size: 45px;
+	left: 1px;
 }
 
 .checked::before {
@@ -75,33 +74,44 @@ ul.list > li {
 
 ul.list > li > div > div.check {
 	cursor: pointer;
-	width: 33px;
+	width: 32px;
 	border: 2px solid #929291;
 	background-color: #000;
-	margin-right: 5px;
 	border-radius: 3px;
+	float: left;
+	box-sizing: border-box;
+	height: 32px;
+	line-height: 32px;
 }
 
 ul.list > li > div > div.corpo {
 	cursor: pointer;
 	border: 2px solid #E08E00;
 	background-color: #F1A624;
-	border-radius: 3px;
-	width: 100%;
-	padding: 4px;
+	border-radius: 5px;
+	box-sizing: border-box;
+	line-height: 32px;
+	height: 100%;
+	padding-left: 5px;
+	margin-left: 37px;
+	margin-right: 74px;
 }
 
 ul.list > li > div > div.acao {
-	width: 110px;
+	float: right;
+	position: relative;
+	top: -32px;
 	display: flex;
 }
 
 ul.list > li > div > div.acao > a {
-	width: 30px;
+	width: 32px;
 	border: 2px solid #E2312F;
 	background-color: #DE1928;
-	border-radius: 3px;
+	border-radius: 5px;
 	margin-left: 5px;
+	height: 32px;
+	box-sizing: border-box;
 }
 
 ul.list > li > div > div.acao > a > span{
@@ -116,16 +126,21 @@ ul.list > li > div > div.acao > a > span{
 	bottom: 0;
 	left: 0;
 	width: 100%;
-	color: #fff;
+	padding: 8px;
 	background-color: #DE1928;
-	border: 1px solid #ED4E56;
-	padding: 10px;
+	border: 3px solid #ED4E56;
 	text-align: center;
 	text-decoration: none;
+	color: #fff;
 	font-size: 20px;
 }
 
-/* lista de exercicios */
+button.btn-footer {
+    padding: 10px;
+    margin-bottom: 0;
+}
+
+/* lista das listas */
 .top {
     height: 40px;
 }
@@ -159,23 +174,80 @@ div.titulo {
     font-size: 20px;
 }
 
-/*Exercicio FORM*/
+/*FORM*/
 
-form#form_exercicio {
+div.form {
 	width: 90%;
-	position: relative;
 	margin: 0 auto;
 	margin-top: 20px;
+	border: 5px solid #FCE224;
+	border-top: transparent;
+	border-bottom: transparent;
+	padding: 0 10px;
+	height: 85%;
 }
 
-form#form_exercicio h3 {
-	text-align: center;
+div.field {
+	width: 100%;
+	margin-bottom: 10px;
 }
 
-form#form_exercicio input {
+input {
 	width: 100%;
 	height: 30px;
-	margin: 5px 0 10px 0;
 	font-size: 18px;
 	padding-left: 10px;
+}
+
+span.message-validade {
+    width: 100%;
+    display: block;
+    color: red;
+    font-size: 12px;
+}
+
+.preview, .preview-backface {
+	display: none;
+}
+
+.preview-backface{
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    background-color: black;
+    opacity: 0.9;
+    z-index: 998;
+}
+
+.preview {
+	z-index: 999;
+    position: absolute;
+    left: 9%;
+    top: 16%;
+    width: 75%;
+    padding: 10px 15px;
+    background-color: #FCE224;
+    box-shadow: 5px 5px 6px #99958B;
+    border-radius: 5px;
+}
+
+.preview,
+.preview table td{
+	color: #1F1D1D;
+}
+
+table td:nth-child(1) {
+    font-weight: bold;
+    width: 120px;
+}
+
+.preview > .close{
+	cursor: pointer;
+	float: right;
+	position: relative;
+	top: -30px;
+	right: -3px;
+	font-size: 25px;
 }

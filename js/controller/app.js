@@ -54,13 +54,14 @@ App.inicializar = function (){
 	app.carregarPaginaInicial();
 
 	app.bindEvents();
+
+	Validate.inicializar();
 };
 
 App.prototype.bindEvents = function(){
 	var scope = this;
 
 	////Treino
-
 	$(document).on('click', '#novo_treino', function(e){ e.preventDefault(); scope.novoTreino(); });
 
 	$(document).on('click', 'ul.treinos a.edit', function(e){ e.preventDefault(); scope.editarTreino(this); });
@@ -78,11 +79,21 @@ App.prototype.bindEvents = function(){
 	////Exercicio
 	$(document).on('click', '#novo_exercicio', function(e){e.preventDefault(); scope.novoExercicio(); });
 
-	$(document).on('submit', '#form_exercicio', function(){ scope.novoExercicioSalvar(); return false; });
+	$(document).on('click', '#save_exercicio', function(){ scope.salvarExercicio(); });
 
 	$(document).on('click', '.back.exercicio', function(){ scope.listarExercicios(false, scope.treinoSelecionado.id); });
 
 	$(document).on('click', 'ul.exercicios div.check', function(){ scope.marcarExercicio(this); });
+
+	$(document).on('click', 'ul.exercicios a.remove', function(e){ e.preventDefault(); scope.excluirExercicio(this); });
+
+	$(document).on('click', 'ul.exercicios a.edit', function(e){ e.preventDefault(); scope.editarExercicio(this); });
+
+	$(document).on('sortstop', 'ul.list.exercicios', function(){ scope.ordenarExercicios(); });
+
+	$(document).on('click', 'ul.list.exercicios .corpo', function(){ scope.exibirExercicio(this); });
+
+	$(document).on('click', '.preview .close, .preview-backface', function(){ $('.preview, .preview-backface').fadeOut(300); });
 };
 
 App.prototype.carregarPaginaInicial = function(){
@@ -108,7 +119,7 @@ App.prototype.buscarTreino = function(treinoId){
 
 App.prototype.salvarTreinos = function(){
 
-	localStorage.setItem(this.treinoKey, JSON.stringify(this.treinos));
+	Util.save(this.treinoKey, this.treinos);
 };
 
 App.prototype.montarTreinos = function(){
@@ -141,6 +152,9 @@ App.prototype.novoTreino = function(){
 		this.treinos.push(t);
 
 		this.salvarTreinos();
+
+		var relacionamento = new TreinoExercicio(id);
+		Util.save(id, relacionamento);
 	}
 };
 
@@ -175,15 +189,24 @@ App.prototype.excluirTreino = function(element){
 
 	if(confirmado){
 		var treinoId = element.closest('li').attr('id');
-
+		// remove o treino
 		for (var i = 0; i < this.treinos.length; i++) {
 			if(this.treinos[i].id === treinoId){
 				this.treinos.splice(i, 1);
 				break;
 			}
 		};
-
+		// atualiza o storage de treinos
 		this.salvarTreinos();
+
+		// remove todos os exercicios deste treino
+		this.treinoExercicio = JSON.parse(localStorage.getItem(treinoId));
+		$.each(this.treinoExercicio.exercicios, function(i, ex){
+			localStorage.removeItem(ex);
+		});
+
+		// remove o relacionamento de treino/exercicios
+		localStorage.removeItem(treinoId);
 
 		element.closest('li').slideUp(300, function(){$(this).remove();});
 	}
@@ -213,7 +236,6 @@ App.prototype.ordenarTreinos = function(){
 	var scope = this;
 	$(this.seletorListTreino).find('li').each(function(i, li){
 		li = $(li);
-
 		var t = new Treino();
 
 		t.id    = li.attr('id');
@@ -246,20 +268,13 @@ App.prototype.listarExercicios = function(element, treinoId){
 };
 
 App.prototype.recuperarExercicios = function(treinoId){
-	var dados = localStorage.getItem(treinoId);
-	if(dados) {
-		this.treinoExercicio = JSON.parse(dados);
-		this.exercicios      = [];
-		for (var i = 0; i < this.treinoExercicio.exercicios.length; i++) {
-			var id = this.treinoExercicio.exercicios[i];
-			var ex =  JSON.parse(localStorage.getItem(id));
-			this.exercicios.push(ex);
-		};
-	}
-	else{
-		this.treinoExercicio = new TreinoExercicio(treinoId);
-		localStorage.setItem(treinoId, JSON.stringify(this.treinoExercicio));
-	}
+	this.treinoExercicio = Util.load(treinoId);
+	this.exercicios      = [];
+	for (var i = 0; i < this.treinoExercicio.exercicios.length; i++) {
+		var id = this.treinoExercicio.exercicios[i];
+		var ex = Util.load(id);
+		this.exercicios.push(ex);
+	};
 };
 
 App.prototype.montarExercicios = function(){
@@ -285,19 +300,31 @@ App.prototype.novoExercicio = function(){
 	});
 };
 
-App.prototype.novoExercicioSalvar = function(){
-	var ex   = $('#form_exercicio').serializeObject();
-	ex.feito = false;
-	ex.id    = Util.guid();
+App.prototype.salvarExercicio = function(){
+	if(Validate.valid()){
+		var ex = this.getExercicioForm();
 
-	localStorage.setItem(ex.id, JSON.stringify(ex));
+		Util.save(ex.id, ex);
 
-	this.treinoExercicio.exercicios.push(ex.id);
-	localStorage.setItem(this.treinoExercicio.id, JSON.stringify(this.treinoExercicio));
+		var index = -1;
+		$.each(this.exercicios, function(i, element){
+			if(element.id === ex.id){
+				index = i;
+				return;
+			}
+		});
 
-	this.exercicios.push(ex);
+		if(index >= 0)
+			this.exercicios[index] = ex;
+		else{
+			this.treinoExercicio.exercicios.push(ex.id);
+			Util.save(this.treinoExercicio.id, this.treinoExercicio);
 
-	this.listarExercicios(false, this.treinoSelecionado.id);
+			this.exercicios.push(ex);
+		}
+
+		this.listarExercicios(false, this.treinoSelecionado.id);
+	}
 };
 
 App.prototype.marcarExercicio = function(element){
@@ -319,9 +346,103 @@ App.prototype.marcarExercicio = function(element){
 		}
 	};
 
-	localStorage.setItem(id, JSON.stringify(exercicio));
+	Util.save(id, exercicio);
 };
 
+App.prototype.excluirExercicio = function(element){
+	element = $(element);
+	var li  = element.closest('li');
+	var id  = li.attr('id');
+
+	var index = -1;
+	$.each(this.treinoExercicio.exercicios, function(i, ex){
+		if(ex === id)
+			index = i;
+	});
+
+	if(index >= 0)
+		this.treinoExercicio.exercicios.splice(index, 1);
+
+	index = -1;
+	$.each(this.exercicios, function(i, ex){
+		if(ex.id === id)
+			index = i;
+	});
+
+	if(index >= 0)
+		this.exercicios.splice(index, 1);
+
+	Util.delete(id);
+	Util.save(this.treinoExercicio.id, this.treinoExercicio);
+
+	li.slideUp(300, function(){li.remove();});
+};
+
+App.prototype.editarExercicio = function(element){
+	element = $(element);
+	var li  = element.closest('li');
+	var id  = li.attr('id');
+
+	var exercicio = JSON.parse(localStorage.getItem(id));
+	var scope     = this;
+	Util.carregarPorAjax('exercicio.html', '.container', function(){
+		scope.setExercicioForm(exercicio);
+		$('.titulo').text('Editar Exercício');
+	});
+};
+
+App.prototype.ordenarExercicios = function(){
+	this.treinoExercicio.exercicios = [];
+	var scope = this;
+	$(this.seletorListExerc).find('li').each(function(){
+		var id = $(this).attr('id');
+		scope.treinoExercicio.exercicios.push(id);
+	});
+
+	Util.save(this.treinoExercicio.id, this.treinoExercicio);
+};
+
+App.prototype.exibirExercicio = function(element){
+	var id = $(element).closest('li').attr('id');
+
+	var exercicio = Util.load(id);
+
+	$('#nome').text(exercicio.nome);
+	$('#serie').text(exercicio.serie);
+	$('#repeticao').text(exercicio.repeticao);
+	$('#carga').text(exercicio.carga);
+	$('#aparelho').text(exercicio.aparelho);
+	$('#configuracao').text(exercicio.configuracao);
+
+	$('.preview, .preview-backface').fadeIn(300);
+};
+
+App.prototype.getExercicioForm = function(){
+	var ex = new Exercicio();
+	var id = $('#id').val();
+
+	if(id)
+		ex.id = id;
+
+	ex.nome         = $('#nome').val();
+	ex.serie        = $('#serie').val();
+	ex.repeticao    = $('#repeticao').val();
+	ex.carga        = $('#carga').val();
+	ex.aparelho     = $('#aparelho').val();
+	ex.configuracao = $('#configuracao').val();
+
+	return ex;
+};
+
+App.prototype.setExercicioForm = function(exercicio){
+	$('#id').val(exercicio.id);
+	$('#nome').val(exercicio.nome);
+	$('#serie').val(exercicio.serie);
+	$('#repeticao').val(exercicio.repeticao);
+	$('#carga').val(exercicio.carga);
+	$('#aparelho').val(exercicio.aparelho);
+	$('#configuracao').val(exercicio.configuracao);
+};
 
 var Util = function(){};
 
@@ -346,13 +467,19 @@ Util.carregarPorAjax = function(url, element, callback){
 	});
 };
 
-jQuery.fn.serializeObject = function () {
-    var unindexed_array = this.serializeArray();
-    var indexed_array = {};
+Util.save = function(key, obj){
+	localStorage.setItem(key, JSON.stringify(obj));
+}
 
-    $.map(unindexed_array, function (n, i) {
-        indexed_array[n['name']] = n['value'];
-    });
+Util.load = function(key){
+	var data = localStorage.getItem(key);
 
-    return indexed_array;
-};
+	if(data)
+		return JSON.parse(data);
+
+	return null;
+}
+
+Util.delete = function(key){
+	localStorage.removeItem(key);
+}
