@@ -101,7 +101,7 @@ App.prototype.carregarPaginaInicial = function(){
 
 	Util.carregarPorAjax('treinos.html', '.container', function(){
 		scope.montarTreinos();
-		$('ul.list').sortable();
+		Util.sortableList();
 	});
 };
 
@@ -262,7 +262,7 @@ App.prototype.listarExercicios = function(element, treinoId){
 
 		scope.montarExercicios();
 
-		$('ul.list').sortable();
+		Util.sortableList();
 	});
 };
 
@@ -471,7 +471,7 @@ Util.carregarPorAjax = function(url, element, callback){
 Util.save = function(key, obj){
 
 	localStorage.setItem(key, JSON.stringify(obj));
-}
+};
 
 Util.load = function(key){
 	var data = localStorage.getItem(key);
@@ -480,9 +480,14 @@ Util.load = function(key){
 		return JSON.parse(data);
 
 	return null;
-}
+};
 
 Util.delete = function(key){
 
 	localStorage.removeItem(key);
-}
+};
+
+Util.sortableList = function(){
+
+	$('ul.list').sortable({ delay:300 });
+};
