@@ -138,16 +138,21 @@ App.prototype.salvarTreinos = function(){
 
 App.prototype.montarTreinos = function(){
 	var ul = $(this.seletorListTreino);
+
+	ul.hide();
+
 	for (var i = 0; i < this.treinos.length; i++) {
 		var t = this.treinos[i];
 		var classCheck = t.feito ? 'checked' : 'unchecked';
 
-		var li = $(this.tplItemList.replace('#ID#', t.id).replace('#NOME#', t.nome)).hide();
+		var li = $(this.tplItemList.replace('#ID#', t.id).replace('#NOME#', t.nome));
 
 		li.find('.check').addClass(classCheck);
 
-		li.appendTo(ul).slideDown(300);
+		li.appendTo(ul);
 	};
+
+	ul.slideDown(300);
 };
 
 App.prototype.novoTreino = function(){
@@ -289,6 +294,9 @@ App.prototype.recuperarExercicios = function(treinoId){
 
 App.prototype.montarExercicios = function(){
 	var ul = $(this.seletorListExerc);
+
+	ul.hide();
+
 	for (var i = 0; i < this.exercicios.length; i++) {
 		var e = this.exercicios[i];
 		var classCheck = e.feito ? 'checked' : 'unchecked';
@@ -297,12 +305,14 @@ App.prototype.montarExercicios = function(){
 
 		var nome = aparelho + e.nome + ' - ' + e.serie + ' x ' + e.repeticao + ' - ' + e.carga + 'kg';
 
-		var li = $(this.tplItemList.replace('#ID#', e.id).replace('#NOME#', nome)).hide();
+		var li = $(this.tplItemList.replace('#ID#', e.id).replace('#NOME#', nome));
 
 		li.find('.check').addClass(classCheck);
 
-		li.appendTo(ul).slideDown(300);
+		li.appendTo(ul);
 	};
+
+	ul.slideDown(300);
 };
 
 App.prototype.novoExercicio = function(){
@@ -362,32 +372,36 @@ App.prototype.marcarExercicio = function(element){
 };
 
 App.prototype.excluirExercicio = function(element){
-	element = $(element);
-	var li  = element.closest('li');
-	var id  = li.attr('id');
+	var confirmado = confirm('Deseja realmente excluir este exercício?');
 
-	var index = -1;
-	$.each(this.treinoExercicio.exercicios, function(i, ex){
-		if(ex === id)
-			index = i;
-	});
+	if(confirmado){
+		element = $(element);
+		var li  = element.closest('li');
+		var id  = li.attr('id');
 
-	if(index >= 0)
-		this.treinoExercicio.exercicios.splice(index, 1);
+		var index = -1;
+		$.each(this.treinoExercicio.exercicios, function(i, ex){
+			if(ex === id)
+				index = i;
+		});
 
-	index = -1;
-	$.each(this.exercicios, function(i, ex){
-		if(ex.id === id)
-			index = i;
-	});
+		if(index >= 0)
+			this.treinoExercicio.exercicios.splice(index, 1);
 
-	if(index >= 0)
-		this.exercicios.splice(index, 1);
+		index = -1;
+		$.each(this.exercicios, function(i, ex){
+			if(ex.id === id)
+				index = i;
+		});
 
-	Util.delete(id);
-	Util.save(this.treinoExercicio.id, this.treinoExercicio);
+		if(index >= 0)
+			this.exercicios.splice(index, 1);
 
-	li.slideUp(300, function(){li.remove();});
+		Util.delete(id);
+		Util.save(this.treinoExercicio.id, this.treinoExercicio);
+
+		li.slideUp(300, function(){li.remove();});
+	}
 };
 
 App.prototype.editarExercicio = function(element){
